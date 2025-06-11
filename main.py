@@ -1,4 +1,4 @@
-# main.py - điểm vào chính của ứng dụng
+# main.py - main entry point of the application
 import streamlit as st
 from modules.auth import login_user, create_user
 from modules.db import init_db
@@ -14,23 +14,23 @@ if "logged_in" not in st.session_state:
 if "username" not in st.session_state:
     st.session_state.username = ""
 if "menu" not in st.session_state:
-    st.session_state.menu = "Trang chủ"
+    st.session_state.menu = "Main Page"
 
-menu_options = ["Trang chủ", "Đăng nhập", "Đăng ký", "Lịch sử"]
-selected = st.sidebar.selectbox("Chức năng", menu_options, index=menu_options.index(st.session_state.menu))
+menu_options = ["Main Page", "Sign In", "Sign Up", "History"]
+selected = st.sidebar.selectbox("Function", menu_options, index=menu_options.index(st.session_state.menu))
 st.session_state.menu = selected
 menu = st.session_state.menu
 
-if menu == "Đăng ký":
-    st.title("Đăng ký tài khoản")
-    username = st.text_input("Tên đăng nhập")
-    password = st.text_input("Mật khẩu", type="password")
-    confirm = st.text_input("Xác nhận mật khẩu", type="password")
-    if st.button("Đăng ký"):
+if menu == "Sign Up":
+    st.title("Register Account")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    confirm = st.text_input("Confirm Password", type="password")
+    if st.button("Register"):
         if not username or not password:
-            st.warning("Vui lòng nhập đầy đủ thông tin")
+            st.warning("Please enter all information")
         elif password != confirm:
-            st.error("Mật khẩu không khớp")
+            st.error("Passwords do not match")
         else:
             success, msg = create_user(username, password)
             if success:
@@ -38,36 +38,36 @@ if menu == "Đăng ký":
             else:
                 st.error(msg)
 
-elif menu == "Đăng nhập":
-    st.title("Đăng nhập")
-    username = st.text_input("Tên đăng nhập")
-    password = st.text_input("Mật khẩu", type="password")
-    if st.button("Đăng nhập"):
+elif menu == "Sign In":
+    st.title("Sign In")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Sign In"):
         if login_user(username, password):
             st.session_state.logged_in = True
             st.session_state.username = username
-            st.success(f"Đăng nhập thành công! Xin chào {username}.")
+            st.success(f"Login successful! Welcome {username}.")
             st.rerun()
         else:
-            st.error("Sai tên đăng nhập hoặc mật khẩu")
+            st.error("Incorrect username or password")
 
-elif menu == "Trang chủ":
-    st.title("🌿 Kiểm tra bệnh cây trồng🌳")
-    st.header("Chỉ với 1 bức ảnh, chúng tôi có thể nhận biết bệnh trên cây trồng của bạn! 🤩")
+elif menu == "Main Page":
+    st.title("🌿 Plant Disease Checker🌳")
+    st.header("With just one photo, we can identify diseases on your plants! 🤩")
     if not st.session_state.logged_in:
-        st.warning("Vui lòng đăng nhập để sử dụng ứng dụng")
+        st.warning("Please log in to use the application")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("👉 Đăng nhập ngay"):
-                st.session_state.menu = "Đăng nhập"
+            if st.button("👉 Log In Now"):
+                st.session_state.menu = "Sign In"
                 st.rerun()
         with col2:
-            if st.button("📝 Tạo tài khoản mới"):
-                st.session_state.menu = "Đăng ký"
+            if st.button("📝 Create New Account"):
+                st.session_state.menu = "Sign Up"
                 st.rerun()
     else:
         show_home(st.session_state.username)
 
-elif menu == "Lịch sử":
+elif menu == "History":
     show_user_history(st.session_state.username)
     show_area_statistics()
